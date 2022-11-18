@@ -17,6 +17,12 @@ class UserService:
         )
         self._db.session.commit()
 
+    def get_all_users(self):
+        query_result = self._db.session.execute("SELECT id, username, is_administrator FROM users")
+        users = query_result.fetchall()
+
+        return list(map(lambda user: User(user.username, user.is_administrator, user.id), users))
+
     def get_user(self, entity_id):
         query_result = self._db.session.execute(
             "SELECT id, username, is_administrator FROM users WHERE id=:id",
@@ -25,7 +31,7 @@ class UserService:
         user = query_result.fetchone()
 
         if user:
-            return User(user.id, user.username, user.is_administrator)
+            return User(user.username, user.is_administrator, user.id)
         else:
             return None
 
