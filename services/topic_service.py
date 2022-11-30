@@ -44,3 +44,6 @@ class TopicService:
             {"id": entity_id}
         )
         self._db.session.commit()
+
+
+topic_service = TopicService()

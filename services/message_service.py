@@ -81,3 +81,6 @@ class MessageService:
             {"id": entity_id}
         )
         self._db.session.commit()
+
+
+message_service = MessageService()

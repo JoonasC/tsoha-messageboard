@@ -61,3 +61,6 @@ class MessageChainService:
             {"id": entity_id}
         )
         self._db.session.commit()
+
+
+message_chain_service = MessageChainService()
