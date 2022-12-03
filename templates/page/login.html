@@ -1,0 +1,20 @@
+{% extends "layout/layout.html" %}
+{% block title %}Login{% endblock %}
+{% block page_content %}
+    <div class="d-flex justify-content-center align-items-center h-100 bg-whitesmoke">
+        <div class="login-container shadow-sm">
+            <form action="/login" method="post">
+                <h1 class="display-1 fw-light text-center mb-3">Login</h1>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username_input" placeholder="Username">
+                    <label for="username_input"><i class="bi bi-person-fill"></i> Username</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password_input" placeholder="Password">
+                    <label for="password_input"><i class="bi bi-lock-fill"></i> Password</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

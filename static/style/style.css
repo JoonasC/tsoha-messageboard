@@ -1,0 +1,20 @@
+body {
+    padding-top: 56px;
+}
+
+.login-container {
+    width: 500px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+@media only screen and (max-width: 500px) {
+    .login-container {
+        width: 100%;
+    }
+}
+
+.bg-whitesmoke {
+    background-color: #f5f5f5 !important;
+}
