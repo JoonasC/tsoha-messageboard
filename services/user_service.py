@@ -35,6 +35,18 @@ class UserService:
         else:
             return None
 
+    def get_user_by_username(self, username):
+        query_result = self._db.session.execute(
+            "SELECT id, username, is_administrator FROM users WHERE username=:username",
+            {"username": username}
+        )
+        user = query_result.fetchone()
+
+        if user:
+            return User(user.username, user.is_administrator, user.id)
+        else:
+            return None
+
     def update_user(self, user, password=None):
         self._db.session.execute(
             "UPDATE users SET username=:username, is_administrator=:is_administrator WHERE id=:id",

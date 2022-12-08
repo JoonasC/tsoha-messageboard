@@ -1,0 +1,7 @@
+{% macro fetch_form_input_value(input_id) %}
+{% if form_values %}
+{% if input_id in form_values %}
+{{ form_values[input_id] -}}
+{% endif %}
+{% endif %}
+{% endmacro %}

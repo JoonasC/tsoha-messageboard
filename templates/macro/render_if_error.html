@@ -1,0 +1,5 @@
+{% macro render_if_error(ui_context="generic") %}
+{% if error and error.ui_context == ui_context %}
+{{ caller() -}}
+{% endif %}
+{% endmacro %}
