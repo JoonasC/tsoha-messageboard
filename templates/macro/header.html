@@ -1,0 +1,5 @@
+{% macro activate_link_if_route_is() %}
+{% if request.endpoint in varargs %}
+{{ " active" -}}
+{% endif %}
+{% endmacro %}

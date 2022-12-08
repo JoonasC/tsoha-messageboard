@@ -1,3 +1,4 @@
+{% from "macro/header.html" import activate_link_if_route_is with context %}
 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">Message board</a>
@@ -17,7 +18,8 @@
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
+                    <a class="nav-link{{ activate_link_if_route_is('login_route', 'login_submit_route') }}"
+                       href="/login">Login</a>
                 </li>
                 {% endif %}
             </ul>
