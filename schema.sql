@@ -1,4 +1,4 @@
-CREATE TABLE users (id SERIAL PRIMARY KEY, username VARCHAR(255) UNIQUE, password_hash VARCHAR(95), is_administrator BOOLEAN);
+CREATE TABLE users (id SERIAL PRIMARY KEY, username VARCHAR(255) UNIQUE, password_hash VARCHAR(102), is_administrator BOOLEAN);
 
 CREATE TABLE topics (id SERIAL PRIMARY KEY, name VARCHAR(255) UNIQUE);
 

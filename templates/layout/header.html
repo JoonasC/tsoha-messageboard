@@ -1,7 +1,7 @@
 {% from "macro/header.html" import activate_link_if_route_is with context %}
 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-primary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Message board</a>
+        <a class="navbar-brand" href="{{ url_for('home_route') }}">Message board</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_content">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -12,14 +12,18 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-fill"></i> {{ session.logged_in_user.username }}
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
                     </ul>
                 </li>
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link{{ activate_link_if_route_is('login_route', 'login_submit_route') }}"
-                       href="/login">Login</a>
+                       href="{{ url_for('login_route') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link{{ activate_link_if_route_is('register_route', 'register_submit_route') }}"
+                       href="{{ url_for('register_route') }}">Register</a>
                 </li>
                 {% endif %}
             </ul>

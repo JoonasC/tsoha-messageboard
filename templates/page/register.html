@@ -1,12 +1,12 @@
 {% extends "layout/layout.html" %}
 {% from "macro/render_if_error.html" import render_if_error with context %}
 {% from "macro/form.html" import fetch_form_input_value with context %}
-{% block title %}Login{% endblock %}
+{% block title %}Register{% endblock %}
 {% block page_content %}
 <div class="d-flex justify-content-center align-items-center h-100 bg-whitesmoke">
     <div class="floating-container shadow-sm">
-        <form action="/login" method="post">
-            <h1 class="display-1 fw-light text-center mb-3">Login</h1>
+        <form action="/register" method="post">
+            <h1 class="display-1 fw-light text-center mb-3">Register</h1>
             {% call render_if_error() %}
             <div class="alert alert-danger alert-dismissible d-flex align-items-center mb-3 fade show">
                 <i class="bi bi-exclamation-triangle-fill"></i>
@@ -34,10 +34,7 @@
                 <div class="invalid-feedback">{{ error.message }}</div>
                 {% endcall %}
             </div>
-            <div class="mb-3">
-                <a href="{{ url_for('register_route') }}" class="text-decoration-none">No account yet? Register one.</a>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
     </div>
 </div>

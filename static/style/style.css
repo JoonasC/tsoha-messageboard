@@ -2,7 +2,7 @@ body {
     padding-top: 56px;
 }
 
-.login-container {
+.floating-container {
     width: 500px;
     padding: 15px;
     border-radius: 10px;
@@ -10,7 +10,7 @@ body {
 }
 
 @media only screen and (max-width: 500px) {
-    .login-container {
+    .floating-container {
         width: 100%;
     }
 }
