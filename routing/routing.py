@@ -123,6 +123,16 @@ def register_submit_route():
     try:
         user_service.create_user(User(username, False), password)
     except IntegrityError as exc:
+        if "username" in exc.orig.args[0] and "already exists" in exc.orig.args[0]:
+            return render_template(
+                "page/register.html",
+                error=UiError("This username is already taken", "username_input"),
+                form_values={
+                    "username_input": username,
+                    "password_input": password
+                }
+            )
+
         raise exc
 
     return redirect(url_for("login_route"))
