@@ -5,3 +5,15 @@
 {% endif %}
 {% endif %}
 {% endmacro %}
+
+{% macro generate_csrf_field() %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+{% endmacro %}
+
+{% macro render_if_form_input_has_value(input_id) %}
+{% if form_values %}
+{% if input_id in form_values and form_values[input_id] != "" %}
+{{ caller() -}}
+{% endif %}
+{% endif %}
+{% endmacro %}

@@ -1,11 +1,13 @@
 from re import search
 
-from flask import url_for, redirect, render_template, request, session
+from flask import url_for, abort, redirect, render_template, request, session
 from sqlalchemy.exc import IntegrityError
 
 from app import app
 from dto.ui_error import UiError
 from dto.user import User
+from services.csrf_token_service import csrf_token_service
+from services.topic_service import topic_service
 from services.user_service import user_service
 from utils.session_utils import store_logged_in_user_into_session
 
@@ -24,7 +26,22 @@ def verify_user_is_logged_in():
 
 @app.get("/")
 def home_route():
-    return render_template("page/home.html")
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    if request.args.get("topic_name_search_filter") and request.args.get("topic_name_search_filter") != "":
+        topic_name_search_filter = request.args.get("topic_name_search_filter")
+        topics = topic_service.search_for_topics_by_name(topic_name_search_filter)
+    else:
+        topic_name_search_filter = ""
+        topics = topic_service.get_all_topics()
+
+    return render_template(
+        "page/home.html",
+        topics=topics,
+        form_values={"topic_name_search_input": topic_name_search_filter},
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
 
 
 @app.get("/login")

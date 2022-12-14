@@ -4,8 +4,8 @@
 {% block title %}Login{% endblock %}
 {% block page_content %}
 <div class="d-flex justify-content-center align-items-center h-100 bg-whitesmoke">
-    <div class="floating-container shadow-sm">
-        <form action="/login" method="post">
+    <div class="floating-container p-3 rounded shadow-sm bg-white">
+        <form action="{{ url_for('login_submit_route') }}" method="post">
             <h1 class="display-1 fw-light text-center mb-3">Login</h1>
             {% call render_if_error() %}
             <div class="alert alert-danger alert-dismissible d-flex align-items-center mb-3 fade show">

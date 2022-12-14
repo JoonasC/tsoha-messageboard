@@ -31,6 +31,15 @@ class TopicService:
         else:
             return None
 
+    def search_for_topics_by_name(self, topic_name_search_filter):
+        query_result = self._db.session.execute(
+            "SELECT id, name FROM topics WHERE name ILIKE :topic_name_search_filter",
+            {"topic_name_search_filter": f"%{topic_name_search_filter}%"}
+        )
+        topics = query_result.fetchall()
+
+        return list(map(lambda topic: Topic(topic.name, topic.id), topics))
+
     def update_topic(self, topic):
         self._db.session.execute(
             "UPDATE topics SET name=:name WHERE id=:id",

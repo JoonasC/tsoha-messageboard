@@ -1,5 +1,48 @@
 {% extends "layout/layout.html" %}
+{% from "macro/form.html" import fetch_form_input_value, generate_csrf_field, render_if_form_input_has_value with context %}
 {% block title %}Home{% endblock %}
 {% block page_content %}
-<h1>Home page</h1>
+<div class="h-100 pt-4 bg-whitesmoke">
+    <div class="container d-flex flex-column h-100 border border-bottom-0 bg-white">
+        <div class="row py-1 mb-1 border-bottom">
+            <div class="col-12 col-sm-7">
+                <h1 class="mb-0 fw-light">Topics</h1>
+            </div>
+            <div class="col d-flex align-items-center">
+                <label for="topic_name_search_input" class="me-1">Search:</label>
+                <form action="{{ url_for('home_route') }}" class="flex-fill">
+                    {{ generate_csrf_field() }}
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="topic_name_search_filter"
+                               id="topic_name_search_input"
+                               value="{{ fetch_form_input_value('topic_name_search_input') }}" placeholder="Topic name">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% call render_if_form_input_has_value("topic_name_search_input") %}
+        <div class="mt-1 mb-2">
+            <p>
+                Name filter: <span class="p-2 rounded-pill bg-secondary bg-opacity-25">{{ fetch_form_input_value('topic_name_search_input') }}<a
+                    href="{{ url_for('home_route') }}" class="btn-close ms-1"></a></span>
+            </p>
+        </div>
+        {% endcall %}
+        {% if topics|length > 0 %}
+        <div class="d-flex flex-wrap mx-n1">
+            {% for topic in topics %}
+            <a href="#"
+               class="flex-fill topic-link p-4 m-1 rounded-pill text-center text-decoration-none text-white">
+                {{ topic.name }}
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="flex-fill d-flex justify-content-center align-items-center text-muted">
+            <h3 class="fw-light"><i class="bi bi-emoji-frown"></i> It seems like there are no topics available</h3>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
