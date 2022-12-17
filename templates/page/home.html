@@ -22,17 +22,21 @@
             </div>
         </div>
         {% call render_if_form_input_has_value("topic_name_search_input") %}
-        <div class="mt-1 mb-2">
-            <p>
-                Name filter: <span class="p-2 rounded-pill bg-secondary bg-opacity-25">{{ fetch_form_input_value('topic_name_search_input') }}<a
-                    href="{{ url_for('home_route') }}" class="btn-close ms-1"></a></span>
-            </p>
+        <div class="name-filter-tag-container d-flex">
+            <p class="me-1 text-sm-nowrap">Name filter:</p>
+            <div class="name-filter-tag d-flex justify-content-center align-items-center px-2 rounded-pill bg-secondary bg-opacity-25">
+                <span class="text-truncate">{{ fetch_form_input_value('topic_name_search_input') }}</span>
+                <span>
+                        <a href="{{ url_for('home_route') }}"
+                           class="btn-close ms-1"></a>
+                    </span>
+            </div>
         </div>
         {% endcall %}
         {% if topics|length > 0 %}
         <div class="d-flex flex-wrap mx-n1">
             {% for topic in topics %}
-            <a href="#"
+            <a href="{{ url_for('message_chain_list_route', topic_id=topic.entity_id) }}"
                class="flex-fill topic-link p-4 m-1 rounded-pill text-center text-decoration-none text-white">
                 {{ topic.name }}
             </a>

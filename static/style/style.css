@@ -15,6 +15,23 @@ body {
     background-color: #0b5ed7 !important;
 }
 
+.name-filter-tag-container {
+    min-width: 0;
+}
+
+.name-filter-tag-container p:first-child {
+    margin-top: 2px;
+}
+
+.name-filter-tag {
+    height: 30px;
+    min-width: 0;
+}
+
+.name-filter-tag span:first-child {
+    margin-bottom: 3px;
+}
+
 @media only screen and (max-width: 500px) {
     .floating-container {
         width: 100%;
@@ -24,6 +41,12 @@ body {
 .mx-n1 {
     margin-left: -0.25rem !important;
     margin-right: -0.25rem !important;
+}
+
+@media only screen and (min-width: 576px) {
+    .text-sm-nowrap {
+        white-space: nowrap;
+    }
 }
 
 .bg-whitesmoke {

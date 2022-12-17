@@ -7,6 +7,7 @@ from app import app
 from dto.ui_error import UiError
 from dto.user import User
 from services.csrf_token_service import csrf_token_service
+from services.message_chain_service import message_chain_service
 from services.topic_service import topic_service
 from services.user_service import user_service
 from utils.session_utils import store_logged_in_user_into_session
@@ -40,6 +41,31 @@ def home_route():
         "page/home.html",
         topics=topics,
         form_values={"topic_name_search_input": topic_name_search_filter},
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.get("/topic/<int:topic_id>")
+def message_chain_list_route(topic_id):
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    if request.args.get("message_chain_name_search_filter") \
+            and request.args.get("message_chain_name_search_filter") != "":
+        message_chain_name_search_filter = request.args.get("message_chain_name_search_filter")
+        message_chains = message_chain_service.search_for_message_chains_by_name_in_topic(
+            topic_id,
+            message_chain_name_search_filter
+        )
+    else:
+        message_chain_name_search_filter = ""
+        message_chains = message_chain_service.get_all_message_chains_in_topic(topic_id)
+
+    return render_template(
+        "page/message_chain_list.html",
+        topic_id=topic_id,
+        message_chains=message_chains,
+        form_values={"message_chain_name_search_input": message_chain_name_search_filter},
         csrf_token=csrf_token_service.get_csrf_token()
     )
 

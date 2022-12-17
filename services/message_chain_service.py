@@ -48,6 +48,26 @@ class MessageChainService:
         else:
             return None
 
+    def search_for_message_chains_by_name_in_topic(self, topic_entity_id, message_chain_name_search_filter):
+        query_result = self._db.session.execute(
+            """SELECT id, name, topic_id, user_id FROM message_chains
+            WHERE name ILIKE :message_chain_name_search_filter AND topic_id=:topic_id""",
+            {"message_chain_name_search_filter": f"%{message_chain_name_search_filter}%", "topic_id": topic_entity_id}
+        )
+        message_chains = query_result.fetchall()
+
+        return list(
+            map(
+                lambda message_chain: MessageChain(
+                    message_chain.name,
+                    message_chain.topic_id,
+                    message_chain.user_id,
+                    message_chain.id
+                ),
+                message_chains
+            )
+        )
+
     def update_message_chain(self, message_chain):
         self._db.session.execute(
             "UPDATE message_chains SET name=:name WHERE id=:id",
