@@ -1,5 +1,6 @@
 from config.db import db_conn
 from dto.message import Message
+from dto.user import User
 
 
 class MessageService:
@@ -44,6 +45,36 @@ class MessageService:
                     message.id
                 ),
                 messages
+            )
+        )
+
+    def get_all_messages_and_associated_users_in_message_chain(self, message_chain_entity_id):
+        query_result = self._db.session.execute(
+            """SELECT messages.id, messages.content, messages.message_chain_id, messages.user_id,
+            message_replies.replied_message_id, users.username, users.is_administrator
+            FROM messages LEFT JOIN message_replies ON messages.id=message_replies.message_id
+            INNER JOIN users ON messages.user_id=users.id WHERE messages.message_chain_id=:message_chain_id""",
+            {"message_chain_id": message_chain_entity_id}
+        )
+        messages_and_associated_users = query_result.fetchall()
+
+        return list(
+            map(
+                lambda message_and_associated_user: (
+                    Message(
+                        message_and_associated_user.content,
+                        message_and_associated_user.message_chain_id,
+                        message_and_associated_user.user_id,
+                        message_and_associated_user.replied_message_id,
+                        message_and_associated_user.id
+                    ),
+                    User(
+                        message_and_associated_user.username,
+                        message_and_associated_user.is_administrator,
+                        message_and_associated_user.user_id
+                    )
+                ),
+                messages_and_associated_users
             )
         )
 

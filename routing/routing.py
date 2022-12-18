@@ -9,6 +9,7 @@ from dto.ui_error import UiError
 from dto.user import User
 from services.csrf_token_service import csrf_token_service
 from services.message_chain_service import message_chain_service
+from services.message_service import message_service
 from services.topic_service import topic_service
 from services.user_service import user_service
 from utils.session_utils import fetch_id_of_logged_in_user_from_session, store_logged_in_user_into_session
@@ -117,6 +118,30 @@ def create_new_message_chain_submit_route(topic_id):
         raise exc
 
     return redirect(url_for("message_chain_list_route", topic_id=topic_id))
+
+
+@app.get("/message_chain/<int:message_chain_id>/view")
+def view_message_chain_route(message_chain_id):
+    message_chain = message_chain_service.get_message_chain(message_chain_id)
+
+    messages_and_associated_users = \
+        message_service.get_all_messages_and_associated_users_in_message_chain(message_chain_id)
+
+    messages = {}
+    users = {}
+
+    for message_and_associated_user in messages_and_associated_users:
+        messages[message_and_associated_user[0].entity_id] = message_and_associated_user[0]
+
+        if message_and_associated_user[1].entity_id not in users:
+            users[message_and_associated_user[1].entity_id] = message_and_associated_user[1]
+
+    return render_template(
+        "page/view_message_chain.html",
+        message_chain=message_chain,
+        messages=messages,
+        users=users
+    )
 
 
 @app.get("/login")
