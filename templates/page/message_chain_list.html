@@ -4,7 +4,7 @@
 {% block title %}Message chains{% endblock %}
 {% block page_content %}
 <div class="h-100 pt-4 bg-whitesmoke">
-    <div class="container d-flex flex-column h-100 border border-bottom-0 bg-white">
+    <div class="container d-flex flex-column h-100 pb-1 border border-bottom-0 bg-white">
         <div class="row py-1 mb-1 border-bottom">
             <div class="col-12 col-sm-7">
                 <h1 class="mb-0 fw-light">Message chains</h1>
@@ -37,17 +37,18 @@
             </div>
             {% endcall %}
             <div class="flex-fill d-sm-flex justify-content-sm-end ms-sm-4">
-                <a href="#" class="btn btn-success text-sm-nowrap">New message chain</a>
+                <a href="{{ url_for('create_new_message_chain_route', topic_id=topic_id) }}"
+                   class="btn btn-success text-sm-nowrap">New message chain</a>
             </div>
         </div>
         {% if message_chains|length > 0 %}
         {% for message_chain in message_chains %}
-        <div class="row">
-            <div class="col-12 col-sm-9"><h3 class="fw-light">{{ message_chain.name }}</h3></div>
-            <div class="col">
+        <div class="row p-2{% if loop.first %} border-top{% endif %} border-bottom">
+            <div class="col-12 col-sm-9"><h3 class="mb-0 fw-light">{{ message_chain.name }}</h3></div>
+            <div class="col d-sm-flex justify-content-sm-end">
                 <a href="#" class="btn btn-primary"><i class="bi bi-folder2-open"></i></a>
                 <a href="#"
-                   class="btn btn-warning{% call render_if_user_has_insufficient_credentials(message_chain.user_entity_id) %} disabled{% endcall %}">
+                   class="btn btn-warning{% call render_if_user_has_insufficient_credentials(message_chain.user_entity_id) %} disabled{% endcall %} mx-1">
                     <i class="bi bi-pencil"></i>
                 </a>
                 <a href="#"

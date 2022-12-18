@@ -1,0 +1,31 @@
+{% extends "layout/layout.html" %}
+{% from "macro/render_if_error.html" import render_if_error with context %}
+{% from "macro/form.html" import fetch_form_input_value, generate_csrf_field with context %}
+{% block title %}Create new message chain{% endblock %}
+{% block page_content %}
+<div class="d-flex justify-content-center align-items-center h-100 bg-whitesmoke">
+    <div class="floating-container p-2 rounded border bg-white">
+        <div class="mb-2 text-center">
+            <h1 class="mb-0 fw-light">Create new message chain</h1>
+        </div>
+        <form action="{{ url_for('create_new_message_chain_submit_route', topic_id=topic_id) }}" method="post">
+            {{ generate_csrf_field() }}
+            <div class="mb-3">
+                <label for="name_input">Message chain name</label>
+                <input type="text"
+                       class="form-control{% call render_if_error('name_input') %} is-invalid{% endcall %}"
+                       name="name" id="name_input" value="{{ fetch_form_input_value('name_input') }}"
+                       placeholder="Message chain name">
+                {% call render_if_error("name_input") %}
+                <div class="invalid-feedback">{{ error.message }}</div>
+                {% endcall %}
+            </div>
+            <div class="d-flex">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="{{ url_for('message_chain_list_route', topic_id=topic_id) }}"
+                   class="btn btn-danger ms-1">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
