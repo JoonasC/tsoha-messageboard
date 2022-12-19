@@ -252,6 +252,9 @@ def reply_to_message_chain_submit_route(message_chain_id, replied_message_id=Non
             message_chain_id=message_chain_id,
             replied_message_id=replied_message_id,
             error=UiError("This field is required", "content_input"),
+            form_values={
+                "content_input": content
+            },
             csrf_token=csrf_token_service.get_csrf_token()
         )
 

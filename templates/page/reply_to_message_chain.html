@@ -1,6 +1,6 @@
 {% extends "layout/layout.html" %}
 {% from "macro/render_if_error.html" import render_if_error with context %}
-{% from "macro/form.html" import generate_csrf_field with context %}
+{% from "macro/form.html" import fetch_form_input_value, generate_csrf_field with context %}
 {% block title %}Reply to message chain{% endblock %}
 {% block page_content %}
 <div class="d-flex justify-content-center align-items-center h-100 bg-whitesmoke">
@@ -14,7 +14,9 @@
             <div class="mb-3">
                 <label for="content_input">Message content</label>
                 <textarea class="form-control{% call render_if_error('content_input') %} is-invalid{% endcall %}"
-                          name="content" id="content_input" placeholder="Message content"></textarea>
+                          name="content" id="content_input" placeholder="Message content">
+                    {{ fetch_form_input_value("content_input") }}
+                </textarea>
                 {% call render_if_error("content_input") %}
                 <div class="invalid-feedback">{{ error.message }}</div>
                 {% endcall %}
