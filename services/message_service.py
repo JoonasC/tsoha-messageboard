@@ -9,7 +9,8 @@ class MessageService:
 
     def create_message(self, message):
         message_insert_query_result = self._db.session.execute(
-            "INSERT INTO messages (content, message_chain_id, user_id) VALUES (:content, :message_chain_id, :user_id)",
+            """INSERT INTO messages (content, message_chain_id, user_id) VALUES (:content, :message_chain_id, :user_id)
+            RETURNING id""",
             {
                 "content": message.content,
                 "message_chain_id": message.message_chain_entity_id,
@@ -17,7 +18,7 @@ class MessageService:
             }
         )
         if message.replied_message_entity_id:
-            inserted_message_id = message_insert_query_result.inserted_primary_key[0]
+            inserted_message_id = message_insert_query_result.fetchone()[0]
             self._db.session.execute(
                 """INSERT INTO message_replies (message_id, replied_message_id)
                 VALUES (:message_id, :replied_message_id)""",
@@ -30,7 +31,7 @@ class MessageService:
             """SELECT messages.id, messages.content, messages.message_chain_id, messages.user_id,
             message_replies.replied_message_id
             FROM messages LEFT JOIN message_replies ON messages.id=message_replies.message_id
-            WHERE messages.message_chain_id=:message_chain_id""",
+            WHERE messages.message_chain_id=:message_chain_id ORDER BY messages.id""",
             {"message_chain_id": message_chain_entity_id}
         )
         messages = query_result.fetchall()
@@ -53,7 +54,8 @@ class MessageService:
             """SELECT messages.id, messages.content, messages.message_chain_id, messages.user_id,
             message_replies.replied_message_id, users.username, users.is_administrator
             FROM messages LEFT JOIN message_replies ON messages.id=message_replies.message_id
-            INNER JOIN users ON messages.user_id=users.id WHERE messages.message_chain_id=:message_chain_id""",
+            INNER JOIN users ON messages.user_id=users.id WHERE messages.message_chain_id=:message_chain_id
+            ORDER BY messages.id""",
             {"message_chain_id": message_chain_entity_id}
         )
         messages_and_associated_users = query_result.fetchall()

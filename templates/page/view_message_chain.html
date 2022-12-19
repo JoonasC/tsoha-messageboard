@@ -1,6 +1,6 @@
 {% extends "layout/layout.html" %}
 {% from "macro/render_if_user_has_sufficient_credentials.html" import render_if_user_has_sufficient_credentials with context %}
-{% block title %}message_chain.name{% endblock %}
+{% block title %}{{ message_chain.name }}{% endblock %}
 {% block page_content %}
 <div class="h-100 pt-4 bg-whitesmoke">
     <div class="container d-flex flex-column h-100 pb-1 border border-bottom-0 bg-white">
@@ -8,28 +8,43 @@
             <h1 class="mb-0 fw-light">{{ message_chain.name }}</h1>
         </div>
         <div class="d-flex justify-content-end mb-2">
-            <a href="#" class="btn btn-success">Reply to message chain</a>
+            <a href="{{ url_for('reply_to_message_chain_route', message_chain_id=message_chain.entity_id) }}"
+               class="btn btn-success">Reply to message chain</a>
         </div>
         {% if messages.values()|length > 0 %}
-        <div class="px-2">
+        <div>
             {% for message in messages.values() %}
-            <div class="border p-1 mb-1">
+            <div id="{{ message.entity_id }}" class="p-1 mb-1 rounded border">
                 <p class="fw-bold">{{ users[message.user_entity_id].username }}</p>
+                {% if message.replied_message_entity_id %}
+                <div class="d-flex flex-wrap">
+                    <p class="me-1">Replying to:</p>
+                    {% if message.replied_message_entity_id in messages %}
+                    <a href="#{{ message.replied_message_entity_id }}" class="text-decoration-none">
+                        {{ users[messages[message.replied_message_entity_id].user_entity_id].username }}
+                    </a>
+                    {% else %}
+                    <p class="fw-bold text-muted">A deleted message</p>
+                    {% endif %}
+                </div>
+                {% endif %}
                 <p>{{ message.content }}</p>
-                <div class="d-flex text-muted text-decoration-none">
+                <div class="d-flex flex-wrap">
                     {% call render_if_user_has_sufficient_credentials(message.user_entity_id, false) %}
-                    <a href="#"><i class="bi bi-pencil"></i> Edit</a>
+                    <a href="#" class="text-decoration-none link-secondary"><i class="bi bi-pencil"></i> Edit</a>
                     {% endcall %}
                     {% call render_if_user_has_sufficient_credentials(message.user_entity_id) %}
-                    <a href="#"><i class="bi bi-trash"></i> Delete</a>
+                    <a href="#" class="mx-1 text-decoration-none link-secondary"><i class="bi bi-trash"></i> Delete</a>
                     {% endcall %}
-                    <a href="#"><i class="bi bi-reply"></i> Reply</a>
+                    <a href="{{ url_for('reply_to_message_chain_route', message_chain_id=message_chain.entity_id, replied_message_id=message.entity_id) }}"
+                       class="text-decoration-none link-secondary"><i class="bi bi-reply"></i> Reply</a>
                 </div>
             </div>
             {% endfor %}
         </div>
         <div class="d-flex justify-content-end mt-1">
-            <a href="#" class="btn btn-success">Reply to message chain</a>
+            <a href="{{ url_for('reply_to_message_chain_route', message_chain_id=message_chain.entity_id) }}"
+               class="btn btn-success">Reply to message chain</a>
         </div>
         {% else %}
         <div class="flex-fill d-flex justify-content-center align-items-center text-muted">

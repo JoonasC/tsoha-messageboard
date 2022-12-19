@@ -4,6 +4,7 @@ from flask import url_for, abort, redirect, render_template, request, session
 from sqlalchemy.exc import IntegrityError
 
 from app import app
+from dto.message import Message
 from dto.message_chain import MessageChain
 from dto.ui_error import UiError
 from dto.user import User
@@ -142,6 +143,41 @@ def view_message_chain_route(message_chain_id):
         messages=messages,
         users=users
     )
+
+
+@app.get("/message_chain/<int:message_chain_id>/reply")
+@app.get("/message_chain/<int:message_chain_id>/reply/<int:replied_message_id>")
+def reply_to_message_chain_route(message_chain_id, replied_message_id=None):
+    return render_template(
+        "page/reply_to_message_chain.html",
+        message_chain_id=message_chain_id,
+        replied_message_id=replied_message_id,
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.post("/message_chain/<int:message_chain_id>/reply")
+@app.post("/message_chain/<int:message_chain_id>/reply/<int:replied_message_id>")
+def reply_to_message_chain_submit_route(message_chain_id, replied_message_id=None):
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    content = request.form["content"]
+
+    if not content:
+        return render_template(
+            "page/reply_to_message_chain.html",
+            message_chain_id=message_chain_id,
+            replied_message_id=replied_message_id,
+            error=UiError("This field is required", "content_input"),
+            csrf_token=csrf_token_service.get_csrf_token()
+        )
+
+    message_service.create_message(
+        Message(content, message_chain_id, fetch_id_of_logged_in_user_from_session(), replied_message_id)
+    )
+
+    return redirect(url_for("view_message_chain_route", message_chain_id=message_chain_id))
 
 
 @app.get("/login")
