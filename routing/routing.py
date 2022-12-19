@@ -13,6 +13,7 @@ from services.message_chain_service import message_chain_service
 from services.message_service import message_service
 from services.topic_service import topic_service
 from services.user_service import user_service
+from utils.authorization_utils import user_has_required_privileges
 from utils.session_utils import fetch_id_of_logged_in_user_from_session, store_logged_in_user_into_session
 
 
@@ -121,6 +122,81 @@ def create_new_message_chain_submit_route(topic_id):
     return redirect(url_for("message_chain_list_route", topic_id=topic_id))
 
 
+@app.get("/message_chain/<int:message_chain_id>/edit")
+def edit_message_chain_route(message_chain_id):
+    message_chain = message_chain_service.get_message_chain(message_chain_id)
+
+    if not user_has_required_privileges(message_chain.user_entity_id, False):
+        abort(403)
+
+    return render_template(
+        "page/edit_message_chain.html",
+        message_chain_id=message_chain_id,
+        topic_id=message_chain.topic_entity_id,
+        form_values={
+            "name_input": message_chain.name
+        },
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.post("/message_chain/<int:message_chain_id>/edit")
+def edit_message_chain_submit_route(message_chain_id):
+    message_chain = message_chain_service.get_message_chain(message_chain_id)
+
+    if not user_has_required_privileges(message_chain.user_entity_id, False):
+        abort(403)
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    name = request.form["name"]
+
+    if not name:
+        return render_template(
+            "page/edit_message_chain.html",
+            message_chain_id=message_chain_id,
+            topic_id=message_chain.topic_entity_id,
+            error=UiError("This field is required", "name_input"),
+            form_values={
+                "name_input": name
+            },
+            csrf_token=csrf_token_service.get_csrf_token()
+        )
+
+    try:
+        message_chain_service.update_message_chain(
+            MessageChain(name, message_chain.topic_entity_id, message_chain.user_entity_id, message_chain_id)
+        )
+    except IntegrityError as exc:
+        if "name" in exc.orig.args[0] and "already exists" in exc.orig.args[0]:
+            return render_template(
+                "page/edit_message_chain.html",
+                message_chain_id=message_chain_id,
+                topic_id=message_chain.topic_entity_id,
+                error=UiError("A message chain with this name already exists", "name_input"),
+                form_values={
+                    "name_input": name
+                },
+                csrf_token=csrf_token_service.get_csrf_token()
+            )
+
+        raise exc
+
+    return redirect(url_for("message_chain_list_route", topic_id=message_chain.topic_entity_id))
+
+
+@app.post("/message_chain/<int:message_chain_id>/delete")
+def delete_message_chain_route(message_chain_id):
+    message_chain = message_chain_service.get_message_chain(message_chain_id)
+
+    if not user_has_required_privileges(message_chain.user_entity_id):
+        abort(403)
+
+    message_chain_service.delete_message_chain(message_chain_id)
+
+    return redirect(url_for("message_chain_list_route", topic_id=message_chain.topic_entity_id))
+
+
 @app.get("/message_chain/<int:message_chain_id>/view")
 def view_message_chain_route(message_chain_id):
     message_chain = message_chain_service.get_message_chain(message_chain_id)
@@ -148,6 +224,9 @@ def view_message_chain_route(message_chain_id):
 @app.get("/message_chain/<int:message_chain_id>/reply")
 @app.get("/message_chain/<int:message_chain_id>/reply/<int:replied_message_id>")
 def reply_to_message_chain_route(message_chain_id, replied_message_id=None):
+    if replied_message_id and not message_service.get_message(replied_message_id):
+        abort(500)
+
     return render_template(
         "page/reply_to_message_chain.html",
         message_chain_id=message_chain_id,
@@ -159,6 +238,9 @@ def reply_to_message_chain_route(message_chain_id, replied_message_id=None):
 @app.post("/message_chain/<int:message_chain_id>/reply")
 @app.post("/message_chain/<int:message_chain_id>/reply/<int:replied_message_id>")
 def reply_to_message_chain_submit_route(message_chain_id, replied_message_id=None):
+    if replied_message_id and not message_service.get_message(replied_message_id):
+        abort(500)
+
     if not csrf_token_service.verify_request():
         abort(403)
 
@@ -178,6 +260,18 @@ def reply_to_message_chain_submit_route(message_chain_id, replied_message_id=Non
     )
 
     return redirect(url_for("view_message_chain_route", message_chain_id=message_chain_id))
+
+
+@app.post("/message/<int:message_id>/delete")
+def delete_message_route(message_id):
+    message = message_service.get_message(message_id)
+
+    if not user_has_required_privileges(message.user_entity_id):
+        abort(403)
+
+    message_service.delete_message(message_id)
+
+    return redirect(url_for("view_message_chain_route", message_chain_id=message.message_chain_entity_id))
 
 
 @app.get("/login")
