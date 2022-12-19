@@ -265,6 +265,60 @@ def reply_to_message_chain_submit_route(message_chain_id, replied_message_id=Non
     return redirect(url_for("view_message_chain_route", message_chain_id=message_chain_id))
 
 
+@app.get("/message/<int:message_id>/edit")
+def edit_message_route(message_id):
+    message = message_service.get_message(message_id)
+
+    if not user_has_required_privileges(message.user_entity_id, False):
+        abort(403)
+
+    return render_template(
+        "page/edit_message.html",
+        message_id=message_id,
+        message_chain_id=message.message_chain_entity_id,
+        form_values={
+            "content_input": message.content
+        },
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.post("/message/<int:message_id>/edit")
+def edit_message_submit_route(message_id):
+    message = message_service.get_message(message_id)
+
+    if not user_has_required_privileges(message.user_entity_id, False):
+        abort(403)
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    content = request.form["content"]
+
+    if not content:
+        return render_template(
+            "page/edit_message.html",
+            message_id=message_id,
+            message_chain_id=message.message_chain_entity_id,
+            error=UiError("This field is required", "content_input"),
+            form_values={
+                "content_input": content
+            },
+            csrf_token=csrf_token_service.get_csrf_token()
+        )
+
+    message_service.update_message(
+        Message(
+            content,
+            message.message_chain_entity_id,
+            message.user_entity_id,
+            message.replied_message_entity_id,
+            message_id
+        )
+    )
+
+    return redirect(url_for("view_message_chain_route", message_chain_id=message.message_chain_entity_id))
+
+
 @app.post("/message/<int:message_id>/delete")
 def delete_message_route(message_id):
     message = message_service.get_message(message_id)
