@@ -1,14 +1,14 @@
 # Keskustelupalstasovellus
 
+**Huom**: Sain sovelluksen viimeisteltyä myöhässä, koska minulla ei ollut tarpeeksi aikaa kehittää sitä. Arvostaisin jos
+voisitte tehdä poikkeuksen ja ottaa lukuun myöhässä palautetut sovelluksen osat.
+
 Sovellus toteuttaa perinteisen internetkeskustelupalstan. Sovelluksessa on kahdentyyppisiä käyttäjätunnuksia:
 ylläpitäjiä ja käyttäjiä.
 
 Sovelluksessa on seuraavat ominaisuudet:
 
 - Käyttäjä voi luoda uuden tunnuksen, kirjautua sisään ja kirjautua ulos
-- Käyttäjä voi muokata tunnuksensa nimeä ja salasanaa
-- Käyttäjä voi poistaa tunnuksensa (Tällöin tällä tunnuksella luodut viestit ja viestiketjut eivät poistu, mutta niissä
-  tulee näkymään, että käyttäjän tunnus on poistettu)
 - Käyttäjä voi luoda uuden viestiketjun tietyn aiheen alle (Esimerkiksi: Viestiketju joka koskee Ford Focus -merkkisten
   autojen renkaanvaihtoa autoiluaiheen alla)
 - Käyttäjä, joka loi viestiketjun voi muokata sen otsikkoa tai poistaa sen
@@ -20,7 +20,6 @@ Sovelluksessa on seuraavat ominaisuudet:
 - Ylläpitäjä voi luoda uusia aiheita
 - Ylläpitäjä voi poistaa aiheita (Tällöin myös kaikki viestiketjut ja niiden sisältämät viestit, jotka ovat aiheen alla
   poistuvat)
-- Ylläpitäjä voi poistaa käyttäjän tunnuksen
 - Tämän lisäksi ylläpitäjällä on kaikki samat valtuudet kuin mitä normaalilla käyttäjällä on
 
 ## Sovelluksen käynnistys

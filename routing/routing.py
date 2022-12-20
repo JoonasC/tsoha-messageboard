@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app import app
 from dto.message import Message
 from dto.message_chain import MessageChain
+from dto.topic import Topic
 from dto.ui_error import UiError
 from dto.user import User
 from services.csrf_token_service import csrf_token_service
@@ -13,7 +14,7 @@ from services.message_chain_service import message_chain_service
 from services.message_service import message_service
 from services.topic_service import topic_service
 from services.user_service import user_service
-from utils.authorization_utils import user_has_required_privileges
+from utils.authorization_utils import user_has_required_privileges, user_is_administrator
 from utils.session_utils import fetch_id_of_logged_in_user_from_session, store_logged_in_user_into_session
 
 
@@ -331,6 +332,135 @@ def delete_message_route(message_id):
     return redirect(url_for("view_message_chain_route", message_chain_id=message.message_chain_entity_id))
 
 
+@app.get("/admin/topic/list")
+def admin_topic_list_route():
+    if not user_is_administrator():
+        abort(403)
+
+    topics = topic_service.get_all_topics()
+
+    return render_template(
+        "page/topic_list.html",
+        topics=topics
+    )
+
+
+@app.get("/admin/topic/new")
+def admin_create_new_topic_route():
+    if not user_is_administrator():
+        abort(403)
+
+    return render_template(
+        "page/create_new_topic.html",
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.post("/admin/topic/new")
+def admin_create_new_topic_submit_route():
+    if not user_is_administrator():
+        abort(403)
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    name = request.form["name"]
+
+    if not name:
+        return render_template(
+            "page/create_new_topic.html",
+            error=UiError("This field is required", "name_input"),
+            form_values={
+                "name_input": name
+            },
+            csrf_token=csrf_token_service.get_csrf_token()
+        )
+
+    try:
+        topic_service.create_topic(Topic(name))
+    except IntegrityError as exc:
+        if "name" in exc.orig.args[0] and "already exists" in exc.orig.args[0]:
+            return render_template(
+                "page/create_new_topic.html",
+                error=UiError("A topic with this name already exists", "name_input"),
+                form_values={
+                    "name_input": name
+                },
+                csrf_token=csrf_token_service.get_csrf_token()
+            )
+
+        raise exc
+
+    return redirect(url_for("admin_topic_list_route"))
+
+
+@app.get("/admin/topic/<int:topic_id>/edit")
+def admin_edit_topic_route(topic_id):
+    if not user_is_administrator():
+        abort(403)
+
+    topic = topic_service.get_topic(topic_id)
+
+    return render_template(
+        "page/edit_topic.html",
+        topic_id=topic_id,
+        form_values={
+            "name_input": topic.name
+        },
+        csrf_token=csrf_token_service.get_csrf_token()
+    )
+
+
+@app.post("/admin/topic/<int:topic_id>/edit")
+def admin_edit_topic_submit_route(topic_id):
+    if not user_is_administrator():
+        abort(403)
+    if not csrf_token_service.verify_request():
+        abort(403)
+
+    name = request.form["name"]
+
+    if not name:
+        return render_template(
+            "page/edit_topic.html",
+            topic_id=topic_id,
+            error=UiError("This field is required", "name_input"),
+            form_values={
+                "name_input": name
+            },
+            csrf_token=csrf_token_service.get_csrf_token()
+        )
+
+    try:
+        topic_service.update_topic(
+            Topic(name, topic_id)
+        )
+    except IntegrityError as exc:
+        if "name" in exc.orig.args[0] and "already exists" in exc.orig.args[0]:
+            return render_template(
+                "page/edit_topic.html",
+                topic_id=topic_id,
+                error=UiError("A topic with this name already exists", "name_input"),
+                form_values={
+                    "name_input": name
+                },
+                csrf_token=csrf_token_service.get_csrf_token()
+            )
+
+        raise exc
+
+    return redirect(url_for("admin_topic_list_route"))
+
+
+@app.post("/admin/topic/<int:topic_id>/delete")
+def admin_delete_topic_route(topic_id):
+    if not user_is_administrator():
+        abort(403)
+
+    topic_service.delete_topic(topic_id)
+
+    return redirect(url_for("admin_topic_list_route"))
+
+
 @app.get("/login")
 def login_route():
     return render_template("page/login.html")
@@ -372,6 +502,13 @@ def login_submit_route():
                 "password_input": password
             }
         )
+
+
+@app.get("/logout")
+def logout_route():
+    del session["logged_in_user"]
+
+    return redirect(url_for("login_route"))
 
 
 @app.get("/register")
